@@ -1,0 +1,88 @@
+#!/bin/bash
+
+# Function to print usage
+usage() {
+    echo "Usage: $0 [command]"
+    echo "Commands:"
+    echo "  init         Initialize your system to work with Assignment 3."
+    echo "  dev          Run a dev server to view your solution."
+    echo "  test         Run Selenium integration tests on your solution."
+    echo "  zip          Prepare a ZIP file for submission."
+    exit 1
+}
+
+# Ensure at least one argument is provided
+if [ "$#" -eq 0 ]; then
+    echo "Error: No command provided."
+    usage
+fi
+
+init_command() {
+    if [ "$#" -ne 0 ]; then
+        echo "Error: Incorrect usage of 'init' command."
+        usage
+    fi
+
+    if [ ! -e "package-lock.json" ]; then
+        if ! npm i; then
+            echo "Your system does not have npm installed. Please make sure you've installed Node.js on your system."
+            exit 1
+        fi
+    fi
+
+    if [ ! -e "venv" ]; then
+        if ! python3 -m venv venv; then
+            echo "Your system does not have Python 3 (at least 3.11) installed. Please make sure to install it before running this script."
+            exit 1
+        fi
+
+        source venv/bin/activate
+        pip install -r requirements.txt
+    fi
+ 
+    echo "Success: Initialized your system to work on Assignment 3."
+}
+
+# Function to handle the 'zip' command
+zip_command() {
+    if [ "$#" -ne 0 ]; then
+        echo "Error: Incorrect usage of 'zip' command."
+        usage
+    fi
+
+    if [ ! -s "tic-tac-toe.txt" ]; then
+        echo "Make sure to have a complete log of your tutorial run through in tic-tac-toe.txt."
+    fi
+
+    if [ ! -s "chorus-lapilli.txt" ]; then
+        echo "Make sure to have a complete log of how you built your solution in chorus-lapilli.txt."
+    fi
+
+    npm run zip >/dev/null 2>&1
+    mv chorus-lapilli.zip assign.zip
+    echo "Success: Created assign.zip."
+}
+
+# Handle commands using case statement
+case "$1" in
+    zip)
+        shift
+        zip_command "$@"
+        ;;
+    init)
+        shift
+        init_command "$@"
+        ;;
+    dev)
+        npm run dev
+        ;;
+    test)
+        shift
+        source venv/bin/activate
+        python tester.py "$@"
+        ;;
+    *)
+        echo "Error: Unknown command '$1'"
+        usage
+        ;;
+esac
