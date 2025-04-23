@@ -4,7 +4,6 @@
 usage() {
     echo "Usage: $0 [command]"
     echo "Commands:"
-    echo "  wsl          Run this command before anything else if you're using wsl"
     echo "  init         Initialize your system to work with Assignment 3."
     echo "  dev          Run a dev server to view your solution."
     echo "  test         Run Selenium integration tests on your solution."
@@ -63,35 +62,6 @@ zip_command() {
     echo "Success: Created assign.zip."
 }
 
-wsl() {
-    sed -i -e 's/Chrome/Firefox/' test_main.py
-    apt update
-    apt install -y python3 python3-pip python3-venv wget bzip2 libxtst6 libgtk-3-0 libx11-xcb-dev libdbus-glib-1-2 libxt6 libpci-dev libasound2
-
-    FIREFOX_VERSION=latest
-    FIREFOX_DOWNLOAD_URL="https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=en-US"
-    apt-get update -qqy
-    apt-get -qqy --no-install-recommends install libavcodec-extra libgtk-3-dev libdbus-glib-1-dev
-    rm -rf /var/lib/apt/lists/* /var/cache/apt/*
-    wget --no-verbose -O /tmp/firefox.tar.bz2 $FIREFOX_DOWNLOAD_URL
-    rm -rf /opt/firefox
-    tar -C /opt -xjf /tmp/firefox.tar.bz2
-    rm /tmp/firefox.tar.bz2
-    mv /opt/firefox /opt/firefox-$FIREFOX_VERSION
-    ln -fs /opt/firefox-$FIREFOX_VERSION/firefox /usr/bin/firefox
-
-    # install Geckodriver
-    GECKODRIVER_URL="https://github.com/mozilla/geckodriver/releases/download/v0.34.0/geckodriver-v0.34.0-linux64.tar.gz"
-    cd /tmp
-    wget $GECKODRIVER_URL
-    tar -xvzf geckodriver-v0.34.0-linux64.tar.gz
-    mv geckodriver /usr/local/bin
-
-    # install node v22
-    curl -sL https://deb.nodesource.com/setup_22.x | bash
-    apt install nodejs
-}
-
 # Handle commands using case statement
 case "$1" in
     zip)
@@ -104,9 +74,6 @@ case "$1" in
         ;;
     dev)
         npm run dev
-        ;;
-    wsl)
-        wsl
         ;;
     test)
         shift
