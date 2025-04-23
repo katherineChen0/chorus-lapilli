@@ -2,8 +2,9 @@ import os
 import subprocess
 import unittest
 import urllib.request
+import sys
 
-from selenium.webdriver import Chrome as Browser
+from selenium import webdriver
 
 class TestChorusLapilli(unittest.TestCase):
     '''Integration testing for Chorus Lapilli
@@ -73,7 +74,13 @@ class TestChorusLapilli(unittest.TestCase):
                 raise OSError('Vite terminated before test')
 
         # Configure the Selenium webdriver
-        cls.driver = Browser()
+        if "headless" in sys.argv:
+            options = webdriver.FirefoxOptions()
+            options.add_argument("-headless")
+            cls.driver = webdriver.Firefox(options=options) 
+        else:
+            cls.driver = webdriver.Chrome()
+        
         cls.driver.get(cls.VITE_HOST_ADDR)
         cls.driver.implicitly_wait(0.5)
 
